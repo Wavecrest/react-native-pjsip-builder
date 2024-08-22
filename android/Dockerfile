@@ -19,9 +19,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
 ##############################
 
 # ENV TARGET_ARCHS "armeabi armeabi-v7a x86 mips arm64-v8a x86_64 mips64"
-ENV TARGET_ARCHS "armeabi-v7a x86 arm64-v8a x86_64" 
-ENV ANDROID_NDK_DOWNLOAD_URL "https://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip"
-ENV ANDROID_SDK_DOWNLOAD_URL "https://dl.google.com/android/repository/tools_r25.2.5-linux.zip"
+ENV TARGET_ARCHS "armeabi-v7a x86 arm64-v8a x86_64"
+ENV ANDROID_NDK_DOWNLOAD_URL "https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip"
+ENV ANDROID_SDK_DOWNLOAD_URL "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip"
 ENV ANDROID_SETUP_APIS "23 25"
 ENV ANDROID_BUILD_TOOLS_VERSION 25
 ENV ANDROID_TARGET_API 23
@@ -54,7 +54,7 @@ RUN mkdir -p /sources/android_ndk && \
 
 # Download Android NDK
 RUN cd /sources/android_ndk && \
-	curl -L -# -o ndk.zip "$ANDROID_NDK_DOWNLOAD_URL" && \
+    curl -L -# -o ndk.zip "$ANDROID_NDK_DOWNLOAD_URL" && \
     unzip ndk.zip && \
     rm -rf ndk.zip && \
     mv android-*/* ./
@@ -64,18 +64,13 @@ RUN cd /sources/android_sdk && \
     curl -L -# -o sdk.zip "$ANDROID_SDK_DOWNLOAD_URL" && \
     unzip sdk.zip
 
-RUN cd /sources/android_sdk/tools && \
-    ALL_SDK=$(./android list sdk --all) && \
+RUN cd /sources/android_sdk/cmdline-tools/bin && \
     IFS=" " && \
     for api in $ANDROID_SETUP_APIS; \
     do \
-      PACKAGE=$(echo "${ALL_SDK}" | grep "API ${api}" | head -n 1 | awk '{print $1}' | cut -d'-' -f 1); \
-      echo yes | ./android update sdk --all --filter ${PACKAGE} --no-ui --force; \
+      yes | ./sdkmanager "platforms;android-${api}" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     done && \
-    PACKAGE=$(echo "${ALL_SDK}" | grep "Android SDK Platform-tools" | head -n 1 | awk '{print $1}' | cut -d'-' -f 1) && \
-    echo yes | ./android update sdk --all --filter ${PACKAGE} --no-ui --force && \
-    PACKAGE=$(echo "${ALL_SDK}" | grep "Build-tools" | grep "${BUILD_TOOLS_VERSION}" | head -n 1 | awk '{print $1}' | cut -d'-' -f 1) && \
-    echo yes | ./android update sdk --all --filter ${PACKAGE} --no-ui --force
+    yes | ./sdkmanager "platform-tools"
 
 # Download Pjsip
 RUN cd /sources/pjsip && \
@@ -172,3 +167,4 @@ RUN IFS=" " && \
     do \
       mv /output/openh264/${arch}/lib/libopenh264.so /dist/android/src/main/jniLibs/${arch}/; \
     done
+
