@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:20.04
+FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
@@ -23,7 +23,7 @@ RUN apt-get update && \
 ##############################
 
 # ENV TARGET_ARCHS "armeabi armeabi-v7a x86 mips arm64-v8a x86_64 mips64"
-ENV TARGET_ARCHS "armeabi-v7a arm64-v8a x86_64"
+ENV TARGET_ARCHS "x86_64 armeabi-v7a arm64-v8a"
 ENV ANDROID_NDK_DOWNLOAD_URL "https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip"
 ENV ANDROID_SDK_DOWNLOAD_URL "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip"
 ENV ANDROID_SETUP_APIS "29 34"
@@ -35,9 +35,6 @@ ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.9
 ENV SWIG_DOWNLOAD_URL "http://prdownloads.sourceforge.net/swig/swig-3.0.7.tar.gz"
 
 ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-1.0.2g.tar.gz"
-
-#ENV OPENH264_DOWNLOAD_URL "https://github.com/cisco/openh264/archive/v1.7.0.tar.gz"
-#ENV OPENH264_TARGET_NDK_LEVEL 29
 
 ENV OPUS_DOWNLOAD_URL "http://downloads.xiph.org/releases/opus/opus-1.2.1.tar.gz"
 ENV OPUS_ANDROID_MK_DOWNLOAD_URL "https://trac.pjsip.org/repos/raw-attachment/ticket/1904/Android.mk"
@@ -108,29 +105,19 @@ RUN cd /sources/opus && \
     cd ./jni && \
     curl -k -L -# -o Android.mk "$OPUS_ANDROID_MK_DOWNLOAD_URL"
 
-# Download OpenH264
-#RUN cd /sources/openh264 && \
-#    curl -L -# -o openh264.tar.gz "$OPENH264_DOWNLOAD_URL" && \
-#    tar xzf openh264.tar.gz && \
-#    rm -rf openh264.tar.gz && \
-#    mv openh264-*/* ./
-
 ##############################
 # Build swig, openssl, opus, openh264
 ##############################
 
 RUN mkdir -p /output/openssl/ && \
-    mkdir -p /output/openh264/ && \
     mkdir -p /output/pjsip && \
     mkdir -p /output/opus
 
-# Build opus
 ADD ./build_opus.sh /usr/local/sbin/
-RUN IFS=" " && \
-    for arch in $TARGET_ARCHS; \
-    do \
-      build_opus.sh ${arch}; \
-    done
+
+ADD ./build_openssl.sh /usr/local/sbin/
+
+ADD ./build_pjsip.sh /usr/local/sbin/
 
 # Build swig
 RUN cd /sources/swig && \
@@ -138,27 +125,11 @@ RUN cd /sources/swig && \
     make && \
     make install
 
-# Build OpenH264
-#ADD ./build_openh264.sh /usr/local/sbin/
-#RUN IFS=" " && \
-#    for arch in $TARGET_ARCHS; \
-#    do \
-#      build_openh264.sh ${arch}; \
-#    done
-
-# Build openssl
-ADD ./build_openssl.sh /usr/local/sbin/
 RUN IFS=" " && \
     for arch in $TARGET_ARCHS; \
     do \
+      build_opus.sh ${arch}; \
       build_openssl.sh ${arch}; \
-    done
-
-# Build pjsip
-ADD ./build_pjsip.sh /usr/local/sbin/
-RUN IFS=" " && \
-    for arch in $TARGET_ARCHS; \
-    do \
       build_pjsip.sh ${arch}; \
     done
 
@@ -166,10 +137,3 @@ RUN IFS=" " && \
 RUN mkdir -p /dist/android/src/main && \
     mv /output/pjsip/* /dist/android/src/main && \
     rm -rf /dist/android/src/main/java/org/pjsip/pjsua2/app
-
-#RUN IFS=" " && \
-#    for arch in $TARGET_ARCHS; \
-#    do \
-#      mv /output/openh264/${arch}/lib/libopenh264.so /dist/android/src/main/jniLibs/${arch}/; \
-#    done
-
