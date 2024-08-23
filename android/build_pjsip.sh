@@ -28,8 +28,10 @@ cd /tmp/pjsip
 # Set up the environment for Android NDK cross-compilation
 export TARGET_ABI=${TARGET_ARCH}
 export APP_PLATFORM=android-${ANDROID_TARGET_API}
+
+# Set the NDK paths and compiler based on the target architecture
 export ANDROID_NDK_ROOT=/sources/android_ndk
-export TOOLCHAIN_PATH=/sources/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin
+export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 
 # Set paths for the toolchain
 export PATH=$TOOLCHAIN_PATH:$PATH

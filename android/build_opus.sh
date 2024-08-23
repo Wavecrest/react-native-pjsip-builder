@@ -16,6 +16,24 @@ else
     exit 1
 fi
 
+# Set the NDK paths and compiler based on the target architecture
+export ANDROID_NDK_ROOT=/sources/android_ndk
+export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
+
+if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
+    export CC="armv7a-linux-androideabi21-clang"
+    export CXX="armv7a-linux-androideabi21-clang++"
+elif [ "$TARGET_ARCH" == "arm64-v8a" ]; then
+    export CC="aarch64-linux-android21-clang"
+    export CXX="aarch64-linux-android21-clang++"
+elif [ "$TARGET_ARCH" == "x86_64" ]; then
+    export CC="x86_64-linux-android21-clang"
+    export CXX="x86_64-linux-android21-clang++"
+else
+    echo "Unsupported target architecture: $TARGET_ARCH"
+    exit 1
+fi
+
 # Run ndk-build with the appropriate APP_ABI
 ndk-build APP_ABI="${APP_ABI}"
 

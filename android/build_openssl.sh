@@ -26,14 +26,13 @@ else
     exit 1
 fi
 
-# Set up the NDK toolchain path if targeting Android
-if [[ "$TARGET_OS" == "android" ]]; then
-    export TOOLCHAIN_PATH="/sources/android_ndk/toolchains/llvm/prebuilt/linux-x86_64/bin"
-    export PATH=$TOOLCHAIN_PATH:$PATH
-    export CC=$TOOLCHAIN_PATH/${TOOLCHAIN}21-clang
-    export CXX=$TOOLCHAIN_PATH/${TOOLCHAIN}21-clang++
-    export LINK=${CXX}
-fi
+# Set the NDK paths and compiler based on the target architecture
+export ANDROID_NDK_ROOT=/sources/android_ndk
+export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
+export PATH=$TOOLCHAIN_PATH:$PATH
+export CC=$TOOLCHAIN_PATH/${TOOLCHAIN}21-clang
+export CXX=$TOOLCHAIN_PATH/${TOOLCHAIN}21-clang++
+export LINK=${CXX}
 
 cd /tmp/openssl
 

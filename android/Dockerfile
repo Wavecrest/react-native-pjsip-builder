@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 ubuntu:latest
+FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
@@ -23,7 +23,7 @@ RUN apt-get update && \
 ##############################
 
 # ENV TARGET_ARCHS "armeabi armeabi-v7a x86 mips arm64-v8a x86_64 mips64"
-ENV TARGET_ARCHS "x86_64 armeabi-v7a arm64-v8a"
+ENV TARGET_ARCHS "armeabi-v7a arm64-v8a x86_64"
 ENV ANDROID_NDK_DOWNLOAD_URL "https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip"
 ENV ANDROID_SDK_DOWNLOAD_URL "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip"
 ENV ANDROID_SETUP_APIS "29 34"
@@ -125,13 +125,17 @@ RUN cd /sources/swig && \
     make && \
     make install
 
-RUN IFS=" " && \
-    for arch in $TARGET_ARCHS; \
-    do \
-      build_opus.sh ${arch}; \
-      build_openssl.sh ${arch}; \
-      build_pjsip.sh ${arch}; \
-    done
+RUN build_opus.sh armeabi-v7a;
+RUN build_openssl.sh armeabi-v7a;
+RUN build_pjsip.sh armeabi-v7a;
+
+RUN build_opus.sh arm64-v8a;
+RUN build_openssl.sh arm64-v8a;
+RUN build_pjsip.sh arm64-v8a;
+
+RUN build_opus.sh x86_64;
+RUN build_openssl.sh x86_64;
+RUN build_pjsip.sh x86_64;
 
 # Dist
 RUN mkdir -p /dist/android/src/main && \
