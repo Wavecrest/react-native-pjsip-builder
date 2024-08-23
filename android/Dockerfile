@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM --platform=linux/amd64 ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/New_York
@@ -32,7 +32,7 @@ ENV ANDROID_TARGET_API 29
 
 ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.9.tar.gz"
 
-ENV SWIG_DOWNLOAD_URL "http://prdownloads.sourceforge.net/swig/swig-3.0.7.tar.gz"
+ENV SWIG_DOWNLOAD_URL "https://downloads.sourceforge.net/swig/swig-4.0.2.tar.gz"
 
 ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-1.0.2g.tar.gz"
 
@@ -121,7 +121,7 @@ ADD ./build_pjsip.sh /usr/local/sbin/
 
 # Build swig
 RUN cd /sources/swig && \
-    ./configure && \
+    ./configure CFLAGS="-O2 -march=native" && \
     make && \
     make install
 
