@@ -9,12 +9,10 @@ ENV TZ=America/New_York
 
 RUN apt-get update --fix-missing && \
     apt-get -y upgrade && \
-    apt-get -y dist-upgrade
-
-RUN apt-get update && \
+    apt-get -y dist-upgrade && \
+    apt-get update && \
     apt-get -y install tzdata software-properties-common git curl bzip2 gcc g++ binutils make autoconf openssl \
-    libssl-dev ant libopus0 libpcre3 libpcre3-dev build-essential nasm \
-    openjdk-8-jdk unzip && \
+    libssl-dev ant libopus0 libpcre3 libpcre3-dev build-essential nasm openjdk-8-jdk unzip file && \
     ln -fs /usr/share/zoneinfo/$TZ /etc/localtime && \
     dpkg-reconfigure --frontend noninteractive tzdata
 
@@ -34,7 +32,7 @@ ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.9
 
 ENV SWIG_DOWNLOAD_URL "https://downloads.sourceforge.net/swig/swig-4.0.2.tar.gz"
 
-ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-1.0.2g.tar.gz"
+ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-1.1.1g.tar.gz"
 
 ENV OPUS_DOWNLOAD_URL "http://downloads.xiph.org/releases/opus/opus-1.2.1.tar.gz"
 ENV OPUS_ANDROID_MK_DOWNLOAD_URL "https://trac.pjsip.org/repos/raw-attachment/ticket/1904/Android.mk"
@@ -119,23 +117,25 @@ ADD ./build_openssl.sh /usr/local/sbin/
 
 ADD ./build_pjsip.sh /usr/local/sbin/
 
+RUN build_openssl.sh armeabi-v7a;
+
 # Build swig
 RUN cd /sources/swig && \
-    ./configure CFLAGS="-O2 -march=native" && \
+    ./configure && \
     make && \
     make install
 
-RUN build_opus.sh armeabi-v7a;
 RUN build_openssl.sh armeabi-v7a;
+RUN build_opus.sh armeabi-v7a;
 RUN build_pjsip.sh armeabi-v7a;
 
-RUN build_opus.sh arm64-v8a;
 RUN build_openssl.sh arm64-v8a;
+RUN build_opus.sh arm64-v8a;
 RUN build_pjsip.sh arm64-v8a;
 
-RUN build_opus.sh x86_64;
-RUN build_openssl.sh x86_64;
-RUN build_pjsip.sh x86_64;
+#RUN build_openssl.sh x86_64;
+#RUN build_opus.sh x86_64;
+#RUN build_pjsip.sh x86_64;
 
 # Dist
 RUN mkdir -p /dist/android/src/main && \

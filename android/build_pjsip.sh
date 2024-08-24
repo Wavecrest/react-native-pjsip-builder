@@ -30,22 +30,27 @@ export TARGET_ABI=${TARGET_ARCH}
 export APP_PLATFORM=android-${ANDROID_TARGET_API}
 
 # Set the NDK paths and compiler based on the target architecture
-export ANDROID_NDK_ROOT=/sources/android_ndk
-export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
+export ANDROID_NDK_ROOT=/sources/android_ndk/android-ndk-r25c
+export TOOLCHAIN_PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin"
 
-# Set paths for the toolchain
-export PATH=$TOOLCHAIN_PATH:$PATH
+export PATH="$TOOLCHAIN_PATH:$PATH"
 
 # Cross-compile flags for different architectures
 if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
-    export CC=$TOOLCHAIN_PATH/armv7a-linux-androideabi21-clang
-    export CXX=$TOOLCHAIN_PATH/armv7a-linux-androideabi21-clang++
+    export CC=$TOOLCHAIN_PATH/armv7a-linux-androideabi29-clang
+    export CXX=$TOOLCHAIN_PATH/armv7a-linux-androideabi29-clang++
+    export CFLAGS="-fPIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16"
+    export LDFLAGS="-march=armv7-a -Wl,--fix-cortex-a8"
 elif [ "$TARGET_ARCH" == "arm64-v8a" ]; then
-    export CC=$TOOLCHAIN_PATH/aarch64-linux-android21-clang
-    export CXX=$TOOLCHAIN_PATH/aarch64-linux-android21-clang++
+    export CC=$TOOLCHAIN_PATH/aarch64-linux-android29-clang
+    export CXX=$TOOLCHAIN_PATH/aarch64-linux-android29-clang++
+    export CFLAGS="-fPIC"
+    export LDFLAGS=""
 elif [ "$TARGET_ARCH" == "x86_64" ]; then
-    export CC=$TOOLCHAIN_PATH/x86_64-linux-android21-clang
-    export CXX=$TOOLCHAIN_PATH/x86_64-linux-android21-clang++
+    export CC=$TOOLCHAIN_PATH/x86_64-linux-android29-clang
+    export CXX=$TOOLCHAIN_PATH/x86_64-linux-android29-clang++
+    export CFLAGS="-fPIC"
+    export LDFLAGS=""
 else
     echo "Unsupported target ABI: $TARGET_ARCH"
     exit 1
@@ -58,7 +63,6 @@ fi
     --disable-video \
     --without-openh264 \
     --with-opus="/output/opus/${TARGET_ARCH}"
-#    --with-openh264="/output/openh264/${TARGET_ARCH}" \
 
 # Build PJSIP and SWIG bindings
 make dep
