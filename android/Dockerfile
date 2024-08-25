@@ -117,8 +117,6 @@ ADD ./build_openssl.sh /usr/local/sbin/
 
 ADD ./build_pjsip.sh /usr/local/sbin/
 
-RUN build_openssl.sh armeabi-v7a;
-
 # Build swig
 RUN cd /sources/swig && \
     ./configure && \

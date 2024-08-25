@@ -18,7 +18,7 @@ fi
 
 export APP_PLATFORM=android-29
 # Set the NDK paths and compiler based on the target architecture
-export ANDROID_NDK_ROOT=/sources/android_ndk/android-ndk-r25c
+export ANDROID_NDK_ROOT=/sources/android_ndk
 export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 
 if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
