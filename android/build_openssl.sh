@@ -43,7 +43,7 @@ export LDFLAGS="${ARCH_LINK}"
 cd /tmp/openssl
 
 # Configure and build OpenSSL for the specified target
-./Configure $TARGET no-asm no-unit-test --prefix=$TARGET_PATH --openssldir=$TARGET_PATH -fPIC -D__ANDROID_API__=29
+./Configure $TARGET no-asm no-shared no-unit-test --prefix=$TARGET_PATH --openssldir=$TARGET_PATH -fPIC -D__ANDROID_API__=29
 
 make clean
 make
