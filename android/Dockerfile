@@ -28,13 +28,13 @@ ENV ANDROID_SETUP_APIS "29 34"
 ENV ANDROID_BUILD_TOOLS_VERSION '34.0.0'
 ENV ANDROID_TARGET_API 29
 
-ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.9.tar.gz"
+ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.10.tar.gz"
 
 ENV SWIG_DOWNLOAD_URL "https://downloads.sourceforge.net/swig/swig-4.0.2.tar.gz"
 
 ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-1.1.1g.tar.gz"
 
-ENV OPUS_DOWNLOAD_URL "http://downloads.xiph.org/releases/opus/opus-1.2.1.tar.gz"
+ENV OPUS_DOWNLOAD_URL "http://downloads.xiph.org/releases/opus/opus-1.3.1.tar.gz"
 ENV OPUS_ANDROID_MK_DOWNLOAD_URL "https://trac.pjsip.org/repos/raw-attachment/ticket/1904/Android.mk"
 
 ENV PATH /sources/android_ndk:$PATH
@@ -123,13 +123,13 @@ RUN cd /sources/swig && \
     make && \
     make install
 
-RUN build_openssl.sh armeabi-v7a;
-RUN build_opus.sh armeabi-v7a;
-RUN build_pjsip.sh armeabi-v7a;
-
 RUN build_openssl.sh arm64-v8a;
 RUN build_opus.sh arm64-v8a;
 RUN build_pjsip.sh arm64-v8a;
+
+RUN build_openssl.sh armeabi-v7a;
+RUN build_opus.sh armeabi-v7a;
+RUN build_pjsip.sh armeabi-v7a;
 
 #RUN build_openssl.sh x86_64;
 #RUN build_opus.sh x86_64;

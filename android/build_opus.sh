@@ -24,12 +24,18 @@ export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
 if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
     export CC="armv7a-linux-androideabi29-clang"
     export CXX="armv7a-linux-androideabi29-clang++"
+    export CFLAGS="-fPIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16"
+    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_static.a -lc -lm -march=armv7-a -Wl,--fix-cortex-a8"
 elif [ "$TARGET_ARCH" == "arm64-v8a" ]; then
     export CC="aarch64-linux-android29-clang"
     export CXX="aarch64-linux-android29-clang++"
+    export CFLAGS="-fPIC"
+    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/arm64-v8a $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_static.a -lc -lm"
 elif [ "$TARGET_ARCH" == "x86_64" ]; then
     export CC="x86_64-linux-android29-clang"
     export CXX="x86_64-linux-android29-clang++"
+    export CFLAGS="-fPIC"
+    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/x86_64 $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/x86_64/libc++_static.a -lc -lm"
 else
     echo "Unsupported target architecture: $TARGET_ARCH"
     exit 1

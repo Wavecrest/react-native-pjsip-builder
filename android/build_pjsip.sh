@@ -20,7 +20,8 @@ cat <<EOF > "/tmp/pjsip/pjlib/include/pj/config_site.h"
 #define PJMEDIA_HAS_VIDEO 0
 #define PJMEDIA_AUDIO_DEV_HAS_ANDROID_JNI 0
 #define PJMEDIA_AUDIO_DEV_HAS_OPENSL 1
-#define PJSIP_AUTH_AUTO_SEND_NEXT 0
+#define PJSIP_AUTH_AUTO_SEND_NEXT 1
+#define PJ_HAS_SSL_SOCK 1
 EOF
 
 cd /tmp/pjsip
@@ -40,17 +41,17 @@ if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
     export CC=$TOOLCHAIN_PATH/armv7a-linux-androideabi29-clang
     export CXX=$TOOLCHAIN_PATH/armv7a-linux-androideabi29-clang++
     export CFLAGS="-fPIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16"
-    export LDFLAGS="-march=armv7-a -Wl,--fix-cortex-a8"
+    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_static.a -lc -lm -march=armv7-a -Wl,--fix-cortex-a8"
 elif [ "$TARGET_ARCH" == "arm64-v8a" ]; then
     export CC=$TOOLCHAIN_PATH/aarch64-linux-android29-clang
     export CXX=$TOOLCHAIN_PATH/aarch64-linux-android29-clang++
     export CFLAGS="-fPIC"
-    export LDFLAGS=""
+    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/arm64-v8a $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_static.a -lc -lm"
 elif [ "$TARGET_ARCH" == "x86_64" ]; then
     export CC=$TOOLCHAIN_PATH/x86_64-linux-android29-clang
     export CXX=$TOOLCHAIN_PATH/x86_64-linux-android29-clang++
     export CFLAGS="-fPIC"
-    export LDFLAGS=""
+    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/x86_64 $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/x86_64/libc++_static.a -lc -lm"
 else
     echo "Unsupported target ABI: $TARGET_ARCH"
     exit 1

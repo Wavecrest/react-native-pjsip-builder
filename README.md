@@ -12,14 +12,16 @@ Easily build PJSIP with: OpenSSL, OpenH264, Opus and G.729 for Android and iOS, 
 | OPUS         | 1.2.1 (?) |
 
 ## Build for Android
+
 ```
 git clone https://github.com/datso/react-native-pjsip-builder
-cd react-native-pjsip-builder; ./build_android
 ```
 
 ```
+cd react-native-pjsip-builder/android;
+
 docker buildx build \
---platform linux/arm64,linux/amd64 \
+--platformlinux/amd64 \
 --tag yourtag \
 --cache-from=type=local,src=./cache \
 --cache-to=type=local,dest=./cache,mode=max \

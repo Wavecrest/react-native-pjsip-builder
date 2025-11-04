@@ -4,3 +4,4 @@ ios-dist
 .vagrant
 .DS_Store
 *.tar.gz
+cache

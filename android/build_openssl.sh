@@ -16,12 +16,12 @@ if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
     TARGET="android-arm"
     TOOLCHAIN="armv7a-linux-androideabi29"
     ARCH_FLAGS="-march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fPIC"
-    ARCH_LINK="-march=armv7-a -Wl,--fix-cortex-a8"
+    ARCH_LINK="-L$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a $ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_static.a -lc -lm -march=armv7-a -Wl,--fix-cortex-a8"
 elif [ "$TARGET_ARCH" == "arm64-v8a" ]; then
     TARGET="android-arm64"
     TOOLCHAIN="aarch64-linux-android29"
     ARCH_FLAGS="-fPIC"
-    ARCH_LINK=""
+    ARCH_LINK="-L$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/arm64-v8a $ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_static.a -lc -lm"
 else
     echo "Unsupported target ABI: $TARGET_ARCH"
     exit 1
