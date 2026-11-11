@@ -21,11 +21,12 @@ git clone https://github.com/datso/react-native-pjsip-builder
 cd react-native-pjsip-builder/android;
 
 docker buildx build \
---platformlinux/amd64 \
---tag yourtag \
---cache-from=type=local,src=./cache \
---cache-to=type=local,dest=./cache,mode=max \
---push .
+  --platform linux/amd64 \
+  --cache-from=type=local,src=./cache \
+  --cache-to=type=local,dest=./cache,mode=max \
+  --tag pjsip-android:latest \
+  --load \
+  .
 ```
 
 ## Build for iOS

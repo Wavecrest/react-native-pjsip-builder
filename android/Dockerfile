@@ -21,21 +21,20 @@ RUN apt-get update --fix-missing && \
 ##############################
 
 # ENV TARGET_ARCHS "armeabi armeabi-v7a x86 mips arm64-v8a x86_64 mips64"
-ENV TARGET_ARCHS "armeabi-v7a arm64-v8a x86_64"
-ENV ANDROID_NDK_DOWNLOAD_URL "https://dl.google.com/android/repository/android-ndk-r21e-linux-x86_64.zip"
+ENV TARGET_ARCHS "armeabi-v7a arm64-v8a"
+ENV ANDROID_NDK_DOWNLOAD_URL "https://dl.google.com/android/repository/android-ndk-r28-linux.zip"
 ENV ANDROID_SDK_DOWNLOAD_URL "https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip"
-ENV ANDROID_SETUP_APIS "29 34"
-ENV ANDROID_BUILD_TOOLS_VERSION '34.0.0'
-ENV ANDROID_TARGET_API 29
+ENV ANDROID_SETUP_APIS "29 35"
+ENV ANDROID_BUILD_TOOLS_VERSION '35.0.0'
+ENV ANDROID_TARGET_API 35
 
-ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.10.tar.gz"
+ENV PJSIP_DOWNLOAD_URL "https://github.com/pjsip/pjproject/archive/refs/tags/2.13.tar.gz"
 
-ENV SWIG_DOWNLOAD_URL "https://downloads.sourceforge.net/swig/swig-4.0.2.tar.gz"
+ENV SWIG_DOWNLOAD_URL "https://downloads.sourceforge.net/swig/swig-4.1.1.tar.gz"
 
-ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-1.1.1g.tar.gz"
+ENV OPENSSL_DOWNLOAD_URL "https://www.openssl.org/source/openssl-3.1.2.tar.gz"
 
-ENV OPUS_DOWNLOAD_URL "http://downloads.xiph.org/releases/opus/opus-1.3.1.tar.gz"
-ENV OPUS_ANDROID_MK_DOWNLOAD_URL "https://trac.pjsip.org/repos/raw-attachment/ticket/1904/Android.mk"
+ENV OPUS_DOWNLOAD_URL "http://downloads.xiph.org/releases/opus/opus-1.5.2.tar.gz"
 
 ENV PATH /sources/android_ndk:$PATH
 
@@ -86,6 +85,9 @@ RUN cd /sources/swig && \
     rm -rf swig.tar.gz && \
     mv swig-*/* ./
 
+RUN apt-get install -y libpcre2-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Download OpenSSL
 RUN cd /sources/openssl && \
     curl -L -# -o openssl.tar.gz "$OPENSSL_DOWNLOAD_URL" && \
@@ -98,10 +100,7 @@ RUN cd /sources/opus && \
     curl -k -L -# -o opus.tar.gz "$OPUS_DOWNLOAD_URL" && \
     tar xzf opus.tar.gz && \
     rm -rf opus.tar.gz && \
-    mv opus-*/* ./ && \
-    mkdir ./jni && \
-    cd ./jni && \
-    curl -k -L -# -o Android.mk "$OPUS_ANDROID_MK_DOWNLOAD_URL"
+    mv opus-*/* ./
 
 ##############################
 # Build swig, openssl, opus, openh264

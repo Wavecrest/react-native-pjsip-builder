@@ -15,7 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
 RUN mkdir -p /vialer/ && \
     cd /vialer/ && \
     wget https://github.com/VoIPGRID/Vialer-pjsip-iOS/archive/3.5.zip && \
-    wget https://github.com/VoIPGRID/Vialer-pjsip-iOS/blob/3.5/VialerPJSIP.framework/Versions/A/VialerPJSIP?raw=true && \
+    wget https://github.com/VoIPGRID/Vialer-pjsIOS_SDK_VERSIONip-iOS/blob/3.5/VialerPJSIP.framework/Versions/A/VialerPJSIP?raw=true && \
     unzip 3.5.zip
 
 RUN mkdir -p /dist/ios/VialerPJSIP.framework && \

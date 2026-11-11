@@ -1,54 +1,64 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-TARGET_ARCH=$1
-TARGET_PATH=/output/opus/${TARGET_ARCH}
+TARGET_ARCH=${1:?Usage: $0 <armeabi-v7a|arm64-v8a|x86_64>}
+API_LEVEL="${ANDROID_TARGET_API:-21}"
 
+TARGET_PATH="/output/opus/${TARGET_ARCH}"
+ANDROID_NDK="/sources/android_ndk"
+TOOLCHAIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
+SYSROOT="${TOOLCHAIN}/sysroot"
+
+# Fresh copy of Opus sources (should be the unpacked opus-1.5.2 tarball)
+rm -rf /tmp/opus
 cp -r /sources/opus /tmp/opus
+cd /tmp/opus
 
-cd /tmp/opus/jni
-
-# Valid APP_ABI values: armeabi-v7a, arm64-v8a, x86_64
-if [[ "$TARGET_ARCH" == "armeabi-v7a" || "$TARGET_ARCH" == "arm64-v8a" || "$TARGET_ARCH" == "x86_64" ]]; then
-    APP_ABI="${TARGET_ARCH}"
-else
-    echo "Invalid architecture: $TARGET_ARCH"
+case "$TARGET_ARCH" in
+  armeabi-v7a)
+    HOST_TRIPLE="armv7a-linux-androideabi"
+    CC_BIN="${HOST_TRIPLE}${API_LEVEL}-clang"
+    ;;
+  arm64-v8a)
+    HOST_TRIPLE="aarch64-linux-android"
+    CC_BIN="${HOST_TRIPLE}${API_LEVEL}-clang"
+    ;;
+  x86_64)
+    HOST_TRIPLE="x86_64-linux-android"
+    CC_BIN="${HOST_TRIPLE}${API_LEVEL}-clang"
+    ;;
+  *)
+    echo "Unsupported TARGET_ARCH: ${TARGET_ARCH}"
     exit 1
-fi
+    ;;
+esac
 
-export APP_PLATFORM=android-29
-# Set the NDK paths and compiler based on the target architecture
-export ANDROID_NDK_ROOT=/sources/android_ndk
-export PATH="$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/linux-x86_64/bin:$PATH"
+export PATH="${TOOLCHAIN}/bin:${PATH}"
+export CC="${CC_BIN}"
+export AR="llvm-ar"
+export RANLIB="llvm-ranlib"
 
-if [ "$TARGET_ARCH" == "armeabi-v7a" ]; then
-    export CC="armv7a-linux-androideabi29-clang"
-    export CXX="armv7a-linux-androideabi29-clang++"
-    export CFLAGS="-fPIC -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16"
-    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libc++_static.a -lc -lm -march=armv7-a -Wl,--fix-cortex-a8"
-elif [ "$TARGET_ARCH" == "arm64-v8a" ]; then
-    export CC="aarch64-linux-android29-clang"
-    export CXX="aarch64-linux-android29-clang++"
-    export CFLAGS="-fPIC"
-    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/arm64-v8a $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_static.a -lc -lm"
-elif [ "$TARGET_ARCH" == "x86_64" ]; then
-    export CC="x86_64-linux-android29-clang"
-    export CXX="x86_64-linux-android29-clang++"
-    export CFLAGS="-fPIC"
-    export LDFLAGS="-L$ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/x86_64 $ANDROID_NDK_ROOT/sources/cxx-stl/llvm-libc++/libs/x86_64/libc++_static.a -lc -lm"
-else
-    echo "Unsupported target architecture: $TARGET_ARCH"
-    exit 1
-fi
+export CFLAGS="--sysroot=${SYSROOT} -fPIC -D__ANDROID_API__=${API_LEVEL}"
+export LDFLAGS="--sysroot=${SYSROOT}"
 
-# Run ndk-build with the appropriate APP_ABI
-ndk-build APP_ABI="${APP_ABI}"
+# Configure Opus for cross-compile
+./configure \
+  --host="${HOST_TRIPLE}" \
+  --disable-shared \
+  --enable-static \
+  --with-pic \
+  --disable-extra-programs \
+  --disable-doc \
+  --disable-asm \
+  --prefix="${TARGET_PATH}"
 
-mkdir -p ${TARGET_PATH}/include
-mkdir -p ${TARGET_PATH}/lib
+make clean
+make -j"$(nproc)"
+make install
 
-cp -r ../include ${TARGET_PATH}/include/opus
-cp ../obj/local/${APP_ABI}/libopus.a ${TARGET_PATH}/lib/
+# At this point you have:
+#   ${TARGET_PATH}/lib/libopus.a
+#   ${TARGET_PATH}/include/opus/...
 
-# Clean up temporary directory
+# Clean up
 rm -rf /tmp/opus
