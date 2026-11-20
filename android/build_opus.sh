@@ -2,14 +2,14 @@
 set -euo pipefail
 
 TARGET_ARCH=${1:?Usage: $0 <armeabi-v7a|arm64-v8a|x86_64>}
-API_LEVEL="${ANDROID_TARGET_API:-21}"
+API_LEVEL="${ANDROID_API:?ANDROID_API must be set}"
 
 TARGET_PATH="/output/opus/${TARGET_ARCH}"
 ANDROID_NDK="/sources/android_ndk"
 TOOLCHAIN="${ANDROID_NDK}/toolchains/llvm/prebuilt/linux-x86_64"
 SYSROOT="${TOOLCHAIN}/sysroot"
 
-# Fresh copy of Opus sources (should be the unpacked opus-1.5.2 tarball)
+# Fresh copy of Opus sources
 rm -rf /tmp/opus
 cp -r /sources/opus /tmp/opus
 cd /tmp/opus

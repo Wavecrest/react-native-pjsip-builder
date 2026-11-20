@@ -1,7 +1,9 @@
 dist
-android-dist
 ios-dist
+sources
+release
 .vagrant
 .DS_Store
 *.tar.gz
 cache
+.idea

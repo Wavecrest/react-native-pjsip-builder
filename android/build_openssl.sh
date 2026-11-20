@@ -3,7 +3,7 @@ set -e -x -v
 
 TARGET_ARCH=$1
 TARGET_PATH=/output/openssl/${TARGET_ARCH}
-API_LEVEL="${ANDROID_TARGET_API}"
+API_LEVEL="${ANDROID_API:?ANDROID_API must be set}"
 
 # Clean up the previous build directory if it exists
 rm -rf /tmp/openssl
@@ -51,6 +51,7 @@ cd /tmp/openssl
   no-asm no-shared no-module no-unit-test \
   --prefix="$TARGET_PATH" \
   --openssldir="$TARGET_PATH" \
+  --libdir=lib \
   -fPIC -D__ANDROID_API__="$API_LEVEL"
 
 make clean
